@@ -39,7 +39,7 @@ func (s *Sound) load() {
 		if err != nil {
 			log.Fatal(err)
 		}
-	case "flac":
+	case ".flac":
 		s.streamer, s.format, err = flac.Decode(f)
 		if err != nil {
 			log.Fatal(err)
