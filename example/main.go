@@ -7,9 +7,16 @@ import (
 )
 
 func main() {
-	blop.LoadSound("blop", "sounds/blop.wav")
-	blop.LoadSound("rock", "sounds/rock.mp3")
-
+	err := blop.LoadSound("blop", "sounds/blop.wav")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	err = blop.LoadSound("rock", "sounds/rock.mp3")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	for {
 		fmt.Println("press [ENTER] to play blop")
 		fmt.Scanln()

@@ -21,7 +21,7 @@ type Sound struct {
 	format   beep.Format
 }
 
-func (s *Sound) load() {
+func (s *Sound) load() error {
 	f, err := os.Open(s.path)
 	if err != nil {
 		log.Fatal(err)
@@ -32,17 +32,17 @@ func (s *Sound) load() {
 	case ".wav":
 		s.streamer, s.format, err = wav.Decode(f)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 	case ".mp3":
 		s.streamer, s.format, err = mp3.Decode(f)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 	case ".flac":
 		s.streamer, s.format, err = flac.Decode(f)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 	default:
@@ -51,20 +51,18 @@ func (s *Sound) load() {
 
 	err = speaker.Init(s.format.SampleRate, s.format.SampleRate.N(time.Second/10))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	s.buffer = beep.NewBuffer(s.format)
 	s.buffer.Append(s.streamer)
 	err = s.streamer.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
+	return err
 }
 
 var sounds map[string]*Sound
 
-func LoadSound(key, path string) {
+func LoadSound(key, path string) error {
 	if sounds == nil {
 		sounds = make(map[string]*Sound)
 	}
@@ -72,9 +70,13 @@ func LoadSound(key, path string) {
 	s := Sound{
 		path: path,
 	}
-	s.load()
+	err := s.load()
+	if err != nil {
+		return err
+	}
 
 	sounds[key] = &s
+	return nil
 }
 
 func Play(key string) {
